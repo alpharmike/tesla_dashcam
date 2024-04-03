@@ -19,6 +19,7 @@ DESCRIPTION = "Python program to merge video files created by Tesla " "dashcam"
 URL = "https://github.com/ehendrix23/tesla_dashcam"
 EMAIL = "hendrix_erik@hotmail.com"
 AUTHOR = "Erik Hendrix"
+REQUIRES_PYTHON = ">=3.7"
 VERSION = None
 
 # What packages are required for this module to be executed?
