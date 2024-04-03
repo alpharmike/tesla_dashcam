@@ -23,6 +23,8 @@ import requests
 from dateutil.parser import isoparse
 from psutil import disk_partitions
 from tzlocal import get_localzone
+import multiprocessing
+import functools
 
 import staticmap
 
@@ -4530,8 +4532,10 @@ def main() -> int:
                     f"video_settings attribute movie_filename set to {movie_filename}."
                 )
                 video_settings.update({"movie_filename": movie_filename})
-
-                process_folders(source_folder_list, video_settings, args.delete_source)
+                
+                source_folders_arg = [[source_folder] for source_folder in source_folder_list]
+                with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
+                    pool.map(functools.partial(process_folders, video_settings=video_settings, delete_source=args.delete_source), source_folders_arg)
 
                 print(f"{get_current_timestamp()}Processing of movies has completed.")
                 if args.system_notification:
@@ -4594,10 +4598,10 @@ def main() -> int:
             f"video_settings attribute movie_filename set to {movie_filename}."
         )
         video_settings.update({"movie_filename": movie_filename})
-
-        process_folders(
-            video_settings["source_folder"], video_settings, args.delete_source
-        )
+        
+        source_folders_arg = [[source_folder] for source_folder in video_settings["source_folder"]]
+        with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
+            pool.map(functools.partial(process_folders, video_settings=video_settings, delete_source=args.delete_source), source_folders_arg)
 
 
 if sys.version_info < (3, 8):
