@@ -128,22 +128,6 @@ PLATFORM = sys.platform
 # PLATFORM = "linux"
 
 PROCESSOR = platform_processor()
-if PLATFORM == "darwin" and PROCESSOR == "i386":
-    try:
-        sysctl = run(
-            ["sysctl", "-n", "machdep.cpu.brand_string"],
-            capture_output=True,
-            timeout=120,
-            text=True,
-        )
-    except TimeoutExpired:
-        print("Timeout running sysctl")
-    else:
-        if sysctl.returncode == 0:
-            if search("Apple", sysctl.stdout, re_IGNORECASE) is not None:
-                PROCESSOR = "arm"
-        else:
-            print("Error running sysctl: {sysctl.returncode} - {sysctl.stderr}")
 
 # Allow setting for testing.
 # PROCESSOR = "arm"
@@ -713,7 +697,7 @@ class Camera(object):
     @property
     def xpos(self):
         if not self._xpos_override and hasattr(
-            self._layout, "_" + self._camera + "_xpos"
+                self._layout, "_" + self._camera + "_xpos"
         ):
             return getattr(self._layout, "_" + self._camera + "_xpos")() * self.include
 
@@ -730,7 +714,7 @@ class Camera(object):
     @property
     def ypos(self):
         if not self._ypos_override and hasattr(
-            self._layout, "_" + self._camera + "_ypos"
+                self._layout, "_" + self._camera + "_ypos"
         ):
             return getattr(self._layout, "_" + self._camera + "_ypos")() * self.include
 
@@ -972,89 +956,89 @@ class FullScreen(MovieLayout):
     def _front_xpos(self):
         # Make sure that front is placed in the middle
         return (
-            max(
-                0,
-                self.center_xpos
-                - int(
-                    (
-                        self.cameras("left").width
-                        + self.cameras("front").width
-                        + self.cameras("right").width
+                max(
+                    0,
+                    self.center_xpos
+                    - int(
+                        (
+                                self.cameras("left").width
+                                + self.cameras("front").width
+                                + self.cameras("right").width
+                        )
+                        / 2
                     )
-                    / 2
+                    + self.cameras("left").width,
                 )
-                + self.cameras("left").width,
-            )
-            * self.cameras("front").include
+                * self.cameras("front").include
         )
 
     def _left_xpos(self):
         return (
-            max(
-                0,
-                self.center_xpos
-                - int(
-                    (
-                        self.cameras("left").width
-                        + self.cameras("rear").width
-                        + self.cameras("right").width
-                    )
-                    / 2
-                ),
-            )
-            * self.cameras("left").include
+                max(
+                    0,
+                    self.center_xpos
+                    - int(
+                        (
+                                self.cameras("left").width
+                                + self.cameras("rear").width
+                                + self.cameras("right").width
+                        )
+                        / 2
+                    ),
+                )
+                * self.cameras("left").include
         )
 
     def _left_ypos(self):
         return (
-            self.cameras("front").ypos + self.cameras("front").height
+                self.cameras("front").ypos + self.cameras("front").height
         ) * self.cameras("left").include
 
     def _rear_xpos(self):
         return (
-            max(
-                0,
-                self.center_xpos
-                - int(
-                    (
-                        self.cameras("left").width
-                        + self.cameras("rear").width
-                        + self.cameras("right").width
+                max(
+                    0,
+                    self.center_xpos
+                    - int(
+                        (
+                                self.cameras("left").width
+                                + self.cameras("rear").width
+                                + self.cameras("right").width
+                        )
+                        / 2
                     )
-                    / 2
+                    + self.cameras("left").width,
                 )
-                + self.cameras("left").width,
-            )
-            * self.cameras("rear").include
+                * self.cameras("rear").include
         )
 
     def _rear_ypos(self):
         return (
-            self.cameras("front").ypos + self.cameras("front").height
+                self.cameras("front").ypos + self.cameras("front").height
         ) * self.cameras("rear").include
 
     def _right_xpos(self):
         return (
-            max(
-                0,
-                self.center_xpos
-                - int(
-                    (
-                        self.cameras("left").width
-                        + self.cameras("rear").width
-                        + self.cameras("right").width
+                max(
+                    0,
+                    self.center_xpos
+                    - int(
+                        (
+                                self.cameras("left").width
+                                + self.cameras("rear").width
+                                + self.cameras("right").width
+                        )
+                        / 2
                     )
-                    / 2
+                    + self.cameras("left").width
+                    + self.cameras("rear").width,
                 )
-                + self.cameras("left").width
-                + self.cameras("rear").width,
-            )
-            * self.cameras("right").include
+                * self.cameras("right").include
         )
 
     def _right_ypos(self):
         return (
-            self.cameras("front").ypos + self.cameras("front").height
+                self.cameras("front").ypos + self.cameras("front").height
         ) * self.cameras("right").include
 
 
@@ -1076,17 +1060,17 @@ class WideScreen(FullScreen):
     def _front_width(self):
         return (
             (
-                self.cameras("left").width
-                + self.cameras("rear").width
-                + self.cameras("right").width
+                    self.cameras("left").width
+                    + self.cameras("rear").width
+                    + self.cameras("right").width
             )
             * self.cameras("front").include
             if self.cameras("front").scale is None
             else int(
                 (
-                    self.cameras("front")._width
-                    * self.cameras("front").scale
-                    * self.cameras("front").include
+                        self.cameras("front")._width
+                        * self.cameras("front").scale
+                        * self.cameras("front").include
                 )
             )
         )
@@ -1122,77 +1106,77 @@ class Cross(FullScreen):
                 )
             )
             if (
-                self.cameras("left").include
-                and self.cameras("left").scale >= self.cameras("rear").scale
-                and self.cameras("right").include
-                and self.cameras("right").scale >= self.cameras("rear").scale
-                and self.cameras("rear").include
+                    self.cameras("left").include
+                    and self.cameras("left").scale >= self.cameras("rear").scale
+                    and self.cameras("right").include
+                    and self.cameras("right").scale >= self.cameras("rear").scale
+                    and self.cameras("rear").include
             ):
                 height = int(height / 3 * 2)
             height += self.cameras("rear").height
         else:
             height = (
-                max(self.cameras("left").height, self.cameras("right").height)
-                + self.cameras("rear").height
+                    max(self.cameras("left").height, self.cameras("right").height)
+                    + self.cameras("rear").height
             )
 
         return int(height + self.cameras("front").height)
 
     def _front_xpos(self):
         return (
-            int(max(0, self.center_xpos - (self.cameras("front").width / 2)))
-            * self.cameras("front").include
+                int(max(0, self.center_xpos - (self.cameras("front").width / 2)))
+                * self.cameras("front").include
         )
 
     def _left_xpos(self):
         return (
-            max(
-                0,
-                self.center_xpos
-                - int((self.cameras("left").width + self.cameras("right").width) / 2),
-            )
-            * self.cameras("left").include
+                max(
+                    0,
+                    self.center_xpos
+                    - int((self.cameras("left").width + self.cameras("right").width) / 2),
+                )
+                * self.cameras("left").include
         )
 
     def _left_ypos(self):
         return (
-            self.cameras("front").height
-            + int(
-                (
+                self.cameras("front").height
+                + int(
+            (
                     max(self.cameras("left").height, self.cameras("right").height)
                     - self.cameras("left").height
-                )
-                / 2
             )
+            / 2
+        )
         ) * self.cameras("left").include
 
     def _right_xpos(self):
         return (
-            max(
-                0,
-                self.center_xpos
-                - int((self.cameras("left").width + self.cameras("right").width) / 2)
-                + self.cameras("left").width,
-            )
-            * self.cameras("right").include
+                max(
+                    0,
+                    self.center_xpos
+                    - int((self.cameras("left").width + self.cameras("right").width) / 2)
+                    + self.cameras("left").width,
+                )
+                * self.cameras("right").include
         )
 
     def _right_ypos(self):
         return (
-            self.cameras("front").height
-            + int(
-                (
+                self.cameras("front").height
+                + int(
+            (
                     max(self.cameras("left").height, self.cameras("right").height)
                     - self.cameras("right").height
-                )
-                / 2
             )
+            / 2
+        )
         ) * self.cameras("right").include
 
     def _rear_xpos(self):
         return (
-            int(max(0, self.center_xpos - (self.cameras("rear").width / 2)))
-            * self.cameras("rear").include
+                int(max(0, self.center_xpos - (self.cameras("rear").width / 2)))
+                * self.cameras("rear").include
         )
 
     def _rear_ypos(self):
@@ -1218,7 +1202,7 @@ class Diamond(Cross):
         if self._font._halign == "CENTER":
             # Change alignment to left or right if one of the left/right cameras is excluded.
             if (self.cameras("left").include and not self.cameras("right").include) or (
-                self.cameras("right").include and not self.cameras("left").include
+                    self.cameras("right").include and not self.cameras("left").include
             ):
                 x_pos = int(
                     max(
@@ -1247,9 +1231,9 @@ class Diamond(Cross):
         # Thus overriding font size to get video height without font size to figure our scaling.
         if self.font._size is None:
             scale = (
-                self._video_height(include_fontsize=False)
-                * self.video_width
-                / (1280 * 960)
+                    self._video_height(include_fontsize=False)
+                    * self.video_width
+                    / (1280 * 960)
             )
             return int(max(16, 16 * scale))
         else:
@@ -1258,9 +1242,9 @@ class Diamond(Cross):
     @property
     def video_width(self):
         return (
-            max(self.cameras("front").width, self.cameras("rear").width)
-            + self.cameras("left").width
-            + self.cameras("right").width
+                max(self.cameras("front").width, self.cameras("rear").width)
+                + self.cameras("left").width
+                + self.cameras("right").width
         )
 
     def _video_height(self, include_fontsize=True):
@@ -1281,14 +1265,14 @@ class Diamond(Cross):
 
     def _front_xpos(self):
         return (
-            self.cameras("left").width
-            + int(
-                (
+                self.cameras("left").width
+                + int(
+            (
                     max(self.cameras("front").width, self.cameras("rear").width)
                     - self.cameras("front").width
-                )
-                / 2
             )
+            / 2
+        )
         ) * self.cameras("front").include
 
     def _left_xpos(self):
@@ -1308,14 +1292,14 @@ class Diamond(Cross):
 
     def _rear_xpos(self):
         return (
-            self.cameras("left").width
-            + int(
-                (
+                self.cameras("left").width
+                + int(
+            (
                     max(self.cameras("front").width, self.cameras("rear").width)
                     - self.cameras("rear").width
-                )
-                / 2
             )
+            / 2
+        )
         ) * self.cameras("rear").include
 
 
@@ -1366,7 +1350,7 @@ class SmartFormatter(argparse.HelpFormatter):
 
 
 def search_dict(
-    match_value: object = None, key: str = None, search_list: List[dict] = None
+        match_value: object = None, key: str = None, search_list: List[dict] = None
 ) -> Optional[dict]:
     """
     Returns the 1st element in a list containing dictionaries
@@ -1452,9 +1436,9 @@ def get_movie_files(source_folder, video_settings):
         for pathname in iglob(os.path.expanduser(os.path.expandvars(source_pathname))):
             _LOGGER.debug(f"Processing {pathname}.")
             if (
-                os.path.isdir(pathname)
-                or os.path.ismount(pathname)
-                and not video_settings["exclude_subdirs"]
+                    os.path.isdir(pathname)
+                    or os.path.ismount(pathname)
+                    and not video_settings["exclude_subdirs"]
             ):
                 _LOGGER.debug(f"Retrieving all subfolders for {pathname}.")
                 for folder, _, _ in os.walk(pathname, followlinks=True):
@@ -1484,8 +1468,8 @@ def get_movie_files(source_folder, video_settings):
 
                 # Check if we already processed this timestamp.
                 if (
-                    event_info is not None
-                    and event_info.clip(clip_timestamp) is not None
+                        event_info is not None
+                        and event_info.clip(clip_timestamp) is not None
                 ):
                     # Already processed this clip, moving on.
                     continue
@@ -1641,7 +1625,7 @@ def get_movie_files(source_folder, video_settings):
                             if event_metadata["reason"] is None:
                                 for event_reason in EVENT_REASON:
                                     if match(
-                                        event_reason, event_file_data.get("reason")
+                                            event_reason, event_file_data.get("reason")
                                     ):
                                         event_metadata["reason"] = EVENT_REASON.get(
                                             event_reason
@@ -1766,10 +1750,10 @@ def get_metadata(ffmpeg, filenames):
             line_split = line_split[0].split(":", 1)
             duration_list = line_split[1].split(":")
             duration = (
-                int(duration_list[0]) * 60 * 60
-                + int(duration_list[1]) * 60
-                + int(duration_list[2].split(".")[0])
-                + (float(duration_list[2].split(".")[1]) / 100)
+                    int(duration_list[0]) * 60 * 60
+                    + int(duration_list[1]) * 60
+                    + int(duration_list[2].split(".")[0])
+                    + (float(duration_list[2].split(".")[1]) / 100)
             )
             # File will only be processed if duration is greater then 0
             include = duration > 0
@@ -1790,7 +1774,7 @@ def get_metadata(ffmpeg, filenames):
 
 
 def create_intermediate_movie(
-    event_info: Event, clip_info: Clip, folder_timestamps, video_settings, clip_number
+        event_info: Event, clip_info: Clip, folder_timestamps, video_settings, clip_number
 ):
     """Create intermediate movie files. This is the merging of the 3 camera
 
@@ -1819,10 +1803,10 @@ def create_intermediate_movie(
     starting_timestamp = clip_info.start_timestamp
     ending_timestamp = clip_info.end_timestamp
     if not (
-        folder_timestamps[0] <= starting_timestamp <= folder_timestamps[1]
-        or folder_timestamps[0] <= ending_timestamp <= folder_timestamps[1]
-        or starting_timestamp <= folder_timestamps[0] <= ending_timestamp
-        or starting_timestamp <= folder_timestamps[1] <= ending_timestamp
+            folder_timestamps[0] <= starting_timestamp <= folder_timestamps[1]
+            or folder_timestamps[0] <= ending_timestamp <= folder_timestamps[1]
+            or starting_timestamp <= folder_timestamps[0] <= ending_timestamp
+            or starting_timestamp <= folder_timestamps[1] <= ending_timestamp
     ):
         # This clip is not in-between the timestamps we want, skip it.
         _LOGGER.debug(
@@ -1900,24 +1884,24 @@ def create_intermediate_movie(
     file_already_exist = False
     if video_settings["skip_existing"]:
         temp_movie_name = (
-            os.path.join(
-                video_settings["target_folder"],
-                local_timestamp.strftime("%Y-%m-%dT%H-%M-%S"),
-            )
-            + ".mp4"
+                os.path.join(
+                    video_settings["target_folder"],
+                    local_timestamp.strftime("%Y-%m-%dT%H-%M-%S"),
+                )
+                + ".mp4"
         )
         if os.path.isfile(temp_movie_name):
             file_already_exist = True
         elif (
-            not video_settings["keep_intermediate"]
-            and video_settings["temp_dir"] is not None
+                not video_settings["keep_intermediate"]
+                and video_settings["temp_dir"] is not None
         ):
             temp_movie_name = (
-                os.path.join(
-                    video_settings["temp_dir"],
-                    local_timestamp.strftime("%Y-%m-%dT%H-%M-%S"),
-                )
-                + ".mp4"
+                    os.path.join(
+                        video_settings["temp_dir"],
+                        local_timestamp.strftime("%Y-%m-%dT%H-%M-%S"),
+                    )
+                    + ".mp4"
             )
             if os.path.isfile(temp_movie_name):
                 file_already_exist = True
@@ -1939,7 +1923,7 @@ def create_intermediate_movie(
         target_folder = (
             video_settings["temp_dir"]
             if not video_settings["keep_intermediate"]
-            and video_settings["temp_dir"] is not None
+               and video_settings["temp_dir"] is not None
             else video_settings["target_folder"]
         )
         temp_movie_name = os.path.join(
@@ -1986,7 +1970,7 @@ def create_intermediate_movie(
 
         # Calculate the time until the event
         replacement_strings["event_timestamp_countdown"] = (
-            starting_epoch_timestamp - event_epoch_timestamp
+                starting_epoch_timestamp - event_epoch_timestamp
         )
         replacement_strings[
             "event_timestamp_countdown_rolling"
@@ -2023,17 +2007,17 @@ def create_intermediate_movie(
         ffmpeg_filter += ffmpeg_camera_filter
 
     ffmpeg_filter += (
-        video_settings["clip_positions"]
-        + ffmpeg_text
-        + video_settings["ffmpeg_speed"]
-        + video_settings["ffmpeg_motiononly"]
-        + video_settings["ffmpeg_hwupload"]
+            video_settings["clip_positions"]
+            + ffmpeg_text
+            + video_settings["ffmpeg_speed"]
+            + video_settings["ffmpeg_motiononly"]
+            + video_settings["ffmpeg_hwupload"]
     )
 
     title_timestamp = (
         replacement_strings["event_timestamp"]
         if event_info.metadata.get("reason") == "SENTRY"
-        and replacement_strings["event_timestamp"] != "n/a"
+           and replacement_strings["event_timestamp"] != "n/a"
         else replacement_strings["start_timestamp"]
     )
     title = (
@@ -2052,20 +2036,20 @@ def create_intermediate_movie(
     ]
 
     ffmpeg_command = (
-        [video_settings["ffmpeg_exec"]]
-        + ["-loglevel", "info"]
-        + video_settings["ffmpeg_hwdev"]
-        + video_settings["ffmpeg_hwout"]
+            [video_settings["ffmpeg_exec"]]
+            + ["-loglevel", "info"]
+            + video_settings["ffmpeg_hwdev"]
+            + video_settings["ffmpeg_hwout"]
     )
 
     for ffmpeg_camera_command in ffmpeg_camera_commands:
         ffmpeg_command += ffmpeg_camera_command
 
     ffmpeg_command += (
-        ["-filter_complex", ffmpeg_filter]
-        + ["-map", f"[{video_settings['input_clip']}]"]
-        + video_settings["other_params"]
-        + ffmpeg_metadata
+            ["-filter_complex", ffmpeg_filter]
+            + ["-map", f"[{video_settings['input_clip']}]"]
+            + video_settings["other_params"]
+            + ffmpeg_metadata
     )
 
     ffmpeg_command = ffmpeg_command + ["-y", temp_movie_name]
@@ -2113,8 +2097,8 @@ def create_title_screen(events, video_settings):
     coordinates = []
     for event in events:
         if (
-            event.metadata.get("longitude") is None
-            or event.metadata.get("latitude") is None
+                event.metadata.get("longitude") is None
+                or event.metadata.get("latitude") is None
         ):
             continue
 
@@ -2160,7 +2144,7 @@ def create_title_screen(events, video_settings):
 
 
 def create_movie(
-    movie, event_info, movie_filename, video_settings, chapter_offset, title_screen_map
+        movie, event_info, movie_filename, video_settings, chapter_offset, title_screen_map
 ):
     """Concatenate provided movie files into 1."""
     # Just return if there are no clips.
@@ -2209,12 +2193,12 @@ def create_movie(
             ]
 
             ffmpeg_command = (
-                [video_settings["ffmpeg_exec"]]
-                + ["-loglevel", "info"]
-                + video_settings["ffmpeg_hwdev"]
-                + video_settings["ffmpeg_hwout"]
-                + ffmpeg_params
-                + video_settings["other_params"]
+                    [video_settings["ffmpeg_exec"]]
+                    + ["-loglevel", "info"]
+                    + video_settings["ffmpeg_hwdev"]
+                    + video_settings["ffmpeg_hwout"]
+                    + ffmpeg_params
+                    + video_settings["other_params"]
             )
 
             ffmpeg_command = ffmpeg_command + ["-y", title_video_filename]
@@ -2282,8 +2266,8 @@ def create_movie(
         # file 'file:<actual path>'
         # https://trac.ffmpeg.org/ticket/2702
         file_content = (
-            file_content
-            + f"file 'file:{video_clip.filename.replace(os.sep, '/')}'{os.linesep}"
+                file_content
+                + f"file 'file:{video_clip.filename.replace(os.sep, '/')}'{os.linesep}"
         )
         total_clips = total_clips + 1
         title = video_clip.start_timestamp.astimezone(get_localzone())
@@ -2310,11 +2294,11 @@ def create_movie(
             )
 
         meta_content = (
-            meta_content + f"[CHAPTER]{os.linesep}"
-            f"TIMEBASE=1/1000000000{os.linesep}"
-            f"START={chapter_start}{os.linesep}"
-            f"END={meta_start + video_duration}{os.linesep}"
-            f"title={title.strftime(video_settings['timestamp_format'])}{os.linesep}"
+                meta_content + f"[CHAPTER]{os.linesep}"
+                               f"TIMEBASE=1/1000000000{os.linesep}"
+                               f"START={chapter_start}{os.linesep}"
+                               f"END={meta_start + video_duration}{os.linesep}"
+                               f"title={title.strftime(video_settings['timestamp_format'])}{os.linesep}"
         )
         meta_start = meta_start + 1 + video_duration
 
@@ -2381,7 +2365,7 @@ def create_movie(
             .astimezone(get_localzone())
             .strftime(user_timestamp_format)
             if event_info[0].metadata.get("reason") == "SENTRY"
-            and event_info[0].metadata.get("event_timestamp") is not None
+               and event_info[0].metadata.get("event_timestamp") is not None
             else start_timestamp.astimezone(get_localzone()).strftime(
                 user_timestamp_format
             )
@@ -2406,8 +2390,8 @@ def create_movie(
     for event in event_info:
 
         if (
-            event.metadata.get("longitude") is None
-            or event.metadata.get("latitude") is None
+                event.metadata.get("longitude") is None
+                or event.metadata.get("latitude") is None
         ):
             continue
 
@@ -2437,11 +2421,11 @@ def create_movie(
             break
 
     ffmpeg_command = (
-        [video_settings["ffmpeg_exec"]]
-        + ["-loglevel", "info"]
-        + ffmpeg_params
-        + ffmpeg_metadata
-        + ["-y", movie_filename]
+            [video_settings["ffmpeg_exec"]]
+            + ["-loglevel", "info"]
+            + ffmpeg_params
+            + ffmpeg_metadata
+            + ["-y", movie_filename]
     )
 
     _LOGGER.debug(f"FFMPEG Command: {ffmpeg_command}")
@@ -2471,9 +2455,9 @@ def create_movie(
             if video_settings["set_moviefile_timestamp"] == "STOP":
                 moviefile_timestamp = end_timestamp.astimezone(get_localzone())
             elif (
-                video_settings["set_moviefile_timestamp"] == "SENTRY"
-                and len(event_info) == 1
-                and event_info[0].metadata.get("timestamp") is not None
+                    video_settings["set_moviefile_timestamp"] == "SENTRY"
+                    and len(event_info) == 1
+                    and event_info[0].metadata.get("timestamp") is not None
             ):
                 moviefile_timestamp = (
                     event_info[0].metadata["timestamp"].astimezone(get_localzone())
@@ -2576,8 +2560,8 @@ def process_event(event, event_list, video_settings, delete_source, movies):
 
     # Skip this folder if we it does not fall within provided timestamps.
     if (
-        video_settings["start_timestamp"] is not None
-        and last_clip_tmstp < video_settings["start_timestamp"]
+            video_settings["start_timestamp"] is not None
+            and last_clip_tmstp < video_settings["start_timestamp"]
     ):
         # Clips from this folder are from before start timestamp requested.
         _LOGGER.debug(
@@ -2587,8 +2571,8 @@ def process_event(event, event_list, video_settings, delete_source, movies):
         return
 
     if (
-        video_settings["end_timestamp"] is not None
-        and first_clip_tmstp > video_settings["end_timestamp"]
+            video_settings["end_timestamp"] is not None
+            and first_clip_tmstp > video_settings["end_timestamp"]
     ):
         # Clips from this folder are from after end timestamp requested.
         _LOGGER.debug(
@@ -2622,15 +2606,15 @@ def process_event(event, event_list, video_settings, delete_source, movies):
 
     # Determine offset to use.
     if (
-        event_info.metadata.get("reason") == "SENTRY"
-        and event_info.metadata.get("event_timestamp") is not None
+            event_info.metadata.get("reason") == "SENTRY"
+            and event_info.metadata.get("event_timestamp") is not None
     ):
         # This is a sentry event and we have an event timestamp.
 
         # Are either --sentry_start_offset or --sentry_end_offset provided?
         if (
-            video_settings["sentry_start_offset"] is not None
-            or video_settings["sentry_end_offset"] is not None
+                video_settings["sentry_start_offset"] is not None
+                or video_settings["sentry_end_offset"] is not None
         ):
             # They were, start and end offset are set to their values.
             start_offset = video_settings["sentry_start_offset"]
@@ -2735,18 +2719,18 @@ def process_event(event, event_list, video_settings, delete_source, movies):
 
     # Put them together to create the filename for the folder.
     event_movie_filename = (
-        event_start_timestamp.astimezone(get_localzone()).strftime(
-            "%Y-%m-%dT%H-%M-%S"
-        )
-        + "_"
-        + event_end_timestamp.astimezone(get_localzone()).strftime(
-            "%Y-%m-%dT%H-%M-%S"
-        )
+            event_start_timestamp.astimezone(get_localzone()).strftime(
+                "%Y-%m-%dT%H-%M-%S"
+            )
+            + "_"
+            + event_end_timestamp.astimezone(get_localzone()).strftime(
+        "%Y-%m-%dT%H-%M-%S"
+    )
     )
 
     # Now add full path to it.
     event_movie_filename = (
-        os.path.join(video_settings["target_folder"], event_movie_filename) + ".mp4"
+            os.path.join(video_settings["target_folder"], event_movie_filename) + ".mp4"
     )
 
     # Do not process the files from this folder if we're to skip it if
@@ -2788,11 +2772,11 @@ def process_event(event, event_list, video_settings, delete_source, movies):
         clip_info = event_info.clip(clip_timestamp)
 
         if create_intermediate_movie(
-            event_info,
-            clip_info,
-            (event_start_timestamp, event_end_timestamp),
-            video_settings,
-            clip_number,
+                event_info,
+                clip_info,
+                (event_start_timestamp, event_end_timestamp),
+                video_settings,
+                clip_number,
         ):
 
             if clip_info.filename != event_info.filename:
@@ -2813,12 +2797,12 @@ def process_event(event, event_list, video_settings, delete_source, movies):
     )
 
     if create_movie(
-        event_info,
-        [event_info],
-        event_movie_filename,
-        video_settings,
-        0,
-        video_settings["video_layout"].title_screen_map,
+            event_info,
+            [event_info],
+            event_movie_filename,
+            video_settings,
+            0,
+            video_settings["video_layout"].title_screen_map,
     ):
         if event_info.filename is not None:
             key = event_info.template(
@@ -2860,7 +2844,7 @@ def process_event(event, event_list, video_settings, delete_source, movies):
 
         # And delete the folder
         delete_intermediate([event_folder])
-    
+
 
 def process_folders(source_folders, video_settings, delete_source):
     """Process all clips found within folders."""
@@ -2886,7 +2870,7 @@ def process_folders(source_folders, video_settings, delete_source):
     movies = manager.dict()
 
     events = list(enumerate(sorted(event_list)))
-    
+
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         pool.map(functools.partial(process_event, event_list=event_list, video_settings=video_settings, delete_source=delete_source, movies=movies), events)
 
@@ -2895,91 +2879,10 @@ def process_folders(source_folders, video_settings, delete_source):
     # output a specific filename was provided not matching the filename for the event clip
     movies_list = None
     if movies:
-        if video_settings["merge_subdirs"] or (
-            video_settings["target_filename"] is not None
-            and len(movies) == 1
-            and len(list(movies.values())[0].items) == 1
-            and list(movies.values())[0].first_item.filename
-            != os.path.join(
-                video_settings["target_folder"], video_settings["target_filename"]
-            )
-        ):
-            movies_list = []
-            merge_group_template = video_settings["merge_group_template"]
-            if merge_group_template is not None or merge_group_template == "":
-                _LOGGER.debug(
-                    f"Merging video files in groups based on template "
-                    f"{merge_group_template}, {len(movies)} will be created."
-                )
-            elif video_settings["merge_subdirs"]:
-                _LOGGER.debug(
-                    f"Merging video files into video file "
-                    f"{video_settings['movie_filename']}."
-                )
-
-            for movie in sorted(movies.keys()):
-                if merge_group_template is not None and merge_group_template != "":
-                    movie_filename = movie + ".mp4"
-                else:
-                    movie_filename = video_settings["movie_filename"]
-                    # Make sure it ends in .mp4
-                    if os.path.splitext(movie_filename)[1] != ".mp4":
-                        movie_filename = movie_filename + ".mp4"
-
-                # Add target folder to it
-                movie_filename = os.path.join(
-                    video_settings["target_folder"], movie_filename
-                )
-                print(
-                    f"{get_current_timestamp()}\tCreating movie {movie_filename}, please be patient."
-                )
-
-                # Only set title screen map if requested and # of events for this movie is greater then 1
-                title_screen_map = (
-                    video_settings["video_layout"].title_screen_map
-                    and movies.get(movie).count > 1
-                )
-
-                if create_movie(
-                    movies.get(movie),
-                    movies.get(movie).items_sorted,
-                    movie_filename,
-                    video_settings,
-                    video_settings["chapter_offset"],
-                    title_screen_map,
-                ):
-
-                    if movies.get(movie).filename is not None:
-                        movies_list.append(
-                            (
-                                movies.get(movie).filename,
-                                str(timedelta(seconds=int(movies.get(movie).duration))),
-                            )
-                        )
-
-                        # Delete the 1 event movie if we created the movie because there was only 1 folder.
-                        if not video_settings["merge_subdirs"]:
-                            _LOGGER.debug(
-                                f"Deleting "
-                                f"{list(movies.values())[0].first_item.filename} event file"
-                            )
-                            delete_intermediate(
-                                [list(movies.values())[0].first_item.filename]
-                            )
-                        elif not video_settings["keep_events"]:
-                            # Delete the event files now.
-                            delete_file_list = []
-                            for _, event_info in movies.get(movie).items:
-                                delete_file_list.append(event_info.filename)
-                            _LOGGER.debug(
-                                f"Deleting {len(delete_file_list)} event files"
-                            )
-                            delete_intermediate(delete_file_list)
-        else:
-            print(
-                f"{get_current_timestamp()}All folders have been processed, resulting movie files are located in "
-                f"{video_settings['target_folder']}"
-            )
+        print(
+            f"{get_current_timestamp()}All folders have been processed, resulting movie files are located in "
+            f"{video_settings['target_folder']}"
+        )
     else:
         print(f"{get_current_timestamp()}No clips found.")
 
@@ -2988,61 +2891,16 @@ def process_folders(source_folders, video_settings, delete_source):
         f"{get_current_timestamp()}Total processing time: {str(timedelta(seconds=int((end_time - start_time))))}"
     )
     if video_settings["notification"]:
-        if movies_list is None:
-            # No merging of movies occurred.
-            message = (
-                "{total_folders} folder{folders} with {total_clips} clip{clips} have been processed, "
-                "{target_folder} contains resulting files.".format(
-                    folders="" if len(event_list) < 2 else "s",
-                    total_folders=len(event_list),
-                    clips="" if total_clips < 2 else "s",
-                    total_clips=total_clips,
-                    target_folder=video_settings["target_folder"],
-                )
+        message = (
+            "{total_folders} folder{folders} with {total_clips} clip{clips} have been processed, "
+            "{target_folder} contains resulting files.".format(
+                folders="" if len(event_list) < 2 else "s",
+                total_folders=len(event_list),
+                clips="" if total_clips < 2 else "s",
+                total_clips=total_clips,
+                target_folder=video_settings["target_folder"],
             )
-        else:
-            if len(movies_list) == 1:
-                # Only 1 movie was created.
-                print(
-                    f"{get_current_timestamp()} Movie {movies_list[0][0]} with duration {movies_list[0][0]} "
-                    f"has been created."
-                )
-
-            else:
-                # Multiple movies were created, listing them all out.
-                print(f"{get_current_timestamp()} Following movies have been created:")
-                for movie_entry in movies_list:
-                    print(
-                        f"{get_current_timestamp()}\t{movie_entry[0]} with duration {movie_entry[1]}"
-                    )
-
-            if len(movies) == len(movies_list):
-                # Number of movies created matches how many we should have created.
-                message = (
-                    "{total_folders} folder{folders} with {total_clips} clip{clips} have been processed, "
-                    "{total_movies} movie {movies} been created.".format(
-                        folders="" if len(event_list) < 2 else "s",
-                        total_folders=len(event_list),
-                        clips="" if total_clips < 2 else "s",
-                        total_clips=total_clips,
-                        total_movies=len(movies_list),
-                        movies="has" if len(movies_list) == 1 else "have",
-                    )
-                )
-            else:
-                # Seems creation of some movies failed.
-                message = (
-                    "{total_folders} folder{folders} with {total_clips} clip{clips} have been processed, "
-                    "{total_movies} {movies} been created out of {all_movies}.".format(
-                        folders="" if len(event_list) < 2 else "s",
-                        total_folders=len(event_list),
-                        clips="" if total_clips < 2 else "s",
-                        total_clips=total_clips,
-                        total_movies=len(movies_list),
-                        movies="has" if len(movies_list) == 1 else "have",
-                        all_movies=len(movies),
-                    )
-                )
+        )
 
         notify("TeslaCam", "Completed", message)
         print(message)
@@ -3076,53 +2934,12 @@ def notify_macos(title, subtitle, message):
         print(f"{get_current_timestamp()}Failed in notifification: {str(exc)}")
 
 
-def notify_windows(title, subtitle, message):
-    """Notification on Windows"""
-
-    # Section commented out, waiting to see if it really does not work on Windows 7
-    # This works only on Windows 10 9r Windows Server 2016/2019. Skipping for everything else
-    #    from platform import win32_ver
-    #    if win32_ver()[0] != 10:
-    #        return
-    global TOASTER_INSTANCE
-
-    # noinspection PyBroadException
-    try:
-        # noinspection PyUnresolvedReferences,PyPackageRequirements
-        from win10toast import ToastNotifier
-
-        if TOASTER_INSTANCE is None:
-            TOASTER_INSTANCE = ToastNotifier()
-
-        TOASTER_INSTANCE.show_toast(
-            threaded=True,
-            title=f"{title} {subtitle}",
-            msg=message,
-            duration=5,
-            icon_path=resource_path("tesla_dashcam.ico"),
-        )
-
-        run(["notify-send", f'"{title} {subtitle}"', f'"{message}"'])
-    except Exception:
-        pass
-
-
-def notify_linux(title, subtitle, message):
+def notify(title, subtitle, message):
     """Notification on Linux"""
     try:
         run(["notify-send", f'"{title} {subtitle}"', f'"{message}"'])
     except Exception as exc:
         print(f"{get_current_timestamp()}Failed in notifification: {str(exc)}")
-
-
-def notify(title, subtitle, message):
-    """Call function to send notification based on OS"""
-    if PLATFORM == "darwin":
-        notify_macos(title, subtitle, message)
-    elif PLATFORM == "win32":
-        notify_windows(title, subtitle, message)
-    elif PLATFORM == "linux":
-        notify_linux(title, subtitle, message)
 
 
 def main() -> int:
@@ -3163,7 +2980,7 @@ def main() -> int:
         type=str,
         nargs="*",
         help="Folder(s) (events) containing the saved camera files. Filenames can be provided as well to manage "
-        "individual clips.",
+             "individual clips.",
     )
 
     parser.add_argument(
@@ -3201,7 +3018,7 @@ def main() -> int:
         dest="skip_existing",
         action="store_true",
         help="Skip creating encoded video file if it already exist. Note that only existence is checked, not if "
-        "layout etc. are the same.",
+             "layout etc. are the same.",
     )
     input_group.add_argument(
         "--delete_source",
@@ -3237,8 +3054,8 @@ def main() -> int:
         required=False,
         type=str,
         help="Trigger file to look for instead of waiting for drive to be attached. Once file is discovered then "
-        "processing will start, file will be deleted when processing has been completed. If source is not "
-        "provided then folder where file is located will be used as source.",
+             "processing will start, file will be deleted when processing has been completed. If source is not "
+             "provided then folder where file is located will be used as source.",
     )
 
     layout_group = parser.add_argument_group(
@@ -3252,13 +3069,13 @@ def main() -> int:
         default="FULLSCREEN",
         type=str.upper,
         help="R|Layout of the created video.\n"
-        "    FULLSCREEN: Front camera center top, "
-        "side cameras underneath it with rear camera between side camera.\n"
-        "    WIDESCREEN: Front camera on top with side and rear cameras smaller underneath it.\n"
-        "    PERSPECTIVE: Similar to FULLSCREEN but then with side cameras in perspective.\n"
-        "    CROSS: Front camera center top, side cameras underneath, and rear camera center bottom.\n"
-        "    DIAMOND: Front camera center top, side cameras below front camera left and right of front, "
-        "and rear camera center bottom.\n",
+             "    FULLSCREEN: Front camera center top, "
+             "side cameras underneath it with rear camera between side camera.\n"
+             "    WIDESCREEN: Front camera on top with side and rear cameras smaller underneath it.\n"
+             "    PERSPECTIVE: Similar to FULLSCREEN but then with side cameras in perspective.\n"
+             "    CROSS: Front camera center top, side cameras underneath, and rear camera center bottom.\n"
+             "    DIAMOND: Front camera center top, side cameras below front camera left and right of front, "
+             "and rear camera center bottom.\n",
     )
     layout_group.add_argument(
         "--camera_position",
@@ -3267,20 +3084,20 @@ def main() -> int:
         nargs="+",
         action="append",
         help="R|Set camera clip position within video. Selecting this will override the layout selected!\n"
-        "The camera clip scale will be set to 1280x960, use scale to adjust accordingly.\n"
-        "Default layout is:\n"
-        "    Front: 0x0\n"
-        "    Rear: <width front>x0\n"
-        "    Left: 0xmax(<height front>, <height rear>\n"
-        "    Right: <width front>xmax(<height front>, <height rear>\n"
-        "Using this together with argument camera_order allows one to completely customize the layout\n"
-        "Note that layout chosen also determines camera clip size and thus default position. See scale for respective sizing.\n"
-        "Further, changing the scale of a camera clip would further impact potential positioning."
-        "for example:\n"
-        "  --camera_position camera=left 640x480                          Position left camera at 640x480\n"
-        "  --camera_position camera=right x_pos=640                        Position right camera at x-position 640, y-position based on layout\n"
-        "  --camera_position camera=front y_pos=480                        Position front camera at x-position based on layout, y-position at 480\n"
-        "  --camera_position camera=rear  1280x960                        Position rear camera at 1280x960\n",
+             "The camera clip scale will be set to 1280x960, use scale to adjust accordingly.\n"
+             "Default layout is:\n"
+             "    Front: 0x0\n"
+             "    Rear: <width front>x0\n"
+             "    Left: 0xmax(<height front>, <height rear>\n"
+             "    Right: <width front>xmax(<height front>, <height rear>\n"
+             "Using this together with argument camera_order allows one to completely customize the layout\n"
+             "Note that layout chosen also determines camera clip size and thus default position. See scale for respective sizing.\n"
+             "Further, changing the scale of a camera clip would further impact potential positioning."
+             "for example:\n"
+             "  --camera_position camera=left 640x480                          Position left camera at 640x480\n"
+             "  --camera_position camera=right x_pos=640                        Position right camera at x-position 640, y-position based on layout\n"
+             "  --camera_position camera=front y_pos=480                        Position front camera at x-position based on layout, y-position at 480\n"
+             "  --camera_position camera=rear  1280x960                        Position rear camera at 1280x960\n",
     )
 
     layout_group.add_argument(
@@ -3288,12 +3105,12 @@ def main() -> int:
         dest="clip_order",
         type=str.lower,
         help="R|Determines the order of processing the camera. Normally this is not required unless there is overlap.\n"
-        "When using argument camera_position it is possible to overlap cameras partially or completely, by then\n"
-        "leveraging this argument one can determine which camera will be on top and which one will be bottom."
-        " Default order is: left, front, right, rear. If there is no overlap then the order does not matter.\n"
-        " If not all cameras are specified then default order will be followed for those not specified, and thus be more on top."
-        "for example:\n"
-        "  --camera_order front,rear,left,right                    Makes it that right will be on top, then left, then rear, and front at the bottom.\n",
+             "When using argument camera_position it is possible to overlap cameras partially or completely, by then\n"
+             "leveraging this argument one can determine which camera will be on top and which one will be bottom."
+             " Default order is: left, front, right, rear. If there is no overlap then the order does not matter.\n"
+             " If not all cameras are specified then default order will be followed for those not specified, and thus be more on top."
+             "for example:\n"
+             "  --camera_order front,rear,left,right                    Makes it that right will be on top, then left, then rear, and front at the bottom.\n",
     )
     layout_group.set_defaults(clip_order="front,rear,left,right")
 
@@ -3311,18 +3128,18 @@ def main() -> int:
         nargs="+",
         action="append",
         help="R|Set camera clip scale for all clips, scale of 1 is 1280x960 camera clip.\n"
-        "If provided with value then it is default for all cameras, to set the scale for a specific "
-        "camera provide camera=<front, left, right,rear> <scale>\n"
-        "for example:\n"
-        "  --scale 0.5                                             all are 640x480\n"
-        "  --scale 640x480                                         all are 640x480\n"
-        "  --scale 0.5 --scale camera=front 1                      all are 640x480 except front at 1280x960\n"
-        "  --scale camera=left .25 --scale camera=right 320x240    left and right are set to 320x240\n"
-        "Defaults:\n"
-        "    WIDESCREEN: 1/2 (front 1280x960, others 640x480, video is 1920x1920)\n"
-        "    FULLSCREEN: 1/2 (640x480, video is 1920x960)\n"
-        "    CROSS: 1/2 (640x480, video is 1280x1440)\n"
-        "    DIAMOND: 1/2 (640x480, video is 1920x976)\n",
+             "If provided with value then it is default for all cameras, to set the scale for a specific "
+             "camera provide camera=<front, left, right,rear> <scale>\n"
+             "for example:\n"
+             "  --scale 0.5                                             all are 640x480\n"
+             "  --scale 640x480                                         all are 640x480\n"
+             "  --scale 0.5 --scale camera=front 1                      all are 640x480 except front at 1280x960\n"
+             "  --scale camera=left .25 --scale camera=right 320x240    left and right are set to 320x240\n"
+             "Defaults:\n"
+             "    WIDESCREEN: 1/2 (front 1280x960, others 640x480, video is 1920x1920)\n"
+             "    FULLSCREEN: 1/2 (640x480, video is 1920x960)\n"
+             "    CROSS: 1/2 (640x480, video is 1280x1440)\n"
+             "    DIAMOND: 1/2 (640x480, video is 1920x976)\n",
     )
     layout_group.add_argument(
         "--mirror",
@@ -3330,7 +3147,7 @@ def main() -> int:
         action="store_const",
         const=1,
         help="Video from side and rear cameras as if being viewed through the mirror. Default when not providing "
-        "parameter --no-front. Cannot be used in combination with --rear.",
+             "parameter --no-front. Cannot be used in combination with --rear.",
     )
     layout_group.add_argument(
         "--rear",
@@ -3338,7 +3155,7 @@ def main() -> int:
         action="store_const",
         const=0,
         help="Video from side and rear cameras as if looking backwards. Default when providing parameter --no-front. "
-        "Cannot be used in combination with --mirror.",
+             "Cannot be used in combination with --mirror.",
     )
     layout_group.add_argument(
         "--swap",
@@ -3346,7 +3163,7 @@ def main() -> int:
         action="store_const",
         const=1,
         help="Swap left and right cameras in output, default when side and rear cameras are as if looking backwards. "
-        "See --rear parameter.",
+             "See --rear parameter.",
     )
     layout_group.add_argument(
         "--no-swap",
@@ -3354,7 +3171,7 @@ def main() -> int:
         action="store_const",
         const=0,
         help="Do not swap left and right cameras, default when side and rear cameras are as if looking through a "
-        "mirror. Also see --mirror parameter",
+             "mirror. Also see --mirror parameter",
     )
     layout_group.add_argument(
         "--swap_frontrear",
@@ -3448,13 +3265,13 @@ def main() -> int:
         type=str.lower,
         default="white",
         help="R|Font color for timestamp. Any color is accepted as a color string or RGB value.\n"
-        "Some potential values are:\n"
-        "    white\n"
-        "    yellowgreen\n"
-        "    yellowgreen@0.9\n"
-        "    Red\n:"
-        "    0x2E8B57\n"
-        "For more information on this see ffmpeg documentation for color: https://ffmpeg.org/ffmpeg-utils.html#Color",
+             "Some potential values are:\n"
+             "    white\n"
+             "    yellowgreen\n"
+             "    yellowgreen@0.9\n"
+             "    Red\n:"
+             "    0x2E8B57\n"
+             "For more information on this see ffmpeg documentation for color: https://ffmpeg.org/ffmpeg-utils.html#Color",
     )
     text_overlay_group.add_argument(
         "--text_overlay_fmt",
@@ -3462,21 +3279,21 @@ def main() -> int:
         type=str,
         default="{local_timestamp_rolling}",
         help="R|Format string for text overlay.\n"
-        "Valid format variables:\n"
-        "    {clip_start_timestamp} - Local time the clip starts at\n"
-        "    {clip_end_timestamp} - Local time the clip ends at\n"
-        "    {local_timestamp_rolling} - Local time which continuously updates "
-        "(shorthand for '%%{{pts:localtime:{local_timestamp}:%%x %%X}}'), string\n"
-        "    {event_timestamp} - Timestamp from events.json (if provided), string\n"
-        "    {event_timestamp_countdown_rolling} - Local time which continuously updates "
-        "(shorthand for '%%{{hms:localtime:{event_timestamp}}}'), string\n"
-        "    {event_city} - City name from events.json (if provided), string\n"
-        "    {event_reason} - Recording reason from events.json (if provided), string\n"
-        "    {event_latitude} - Estimated latitude from events.json (if provided), float\n"
-        "    {event_longitude} - Estimated longitude from events.json (if provided), float\n"
-        "    \n"
-        "    All valid ffmpeg 'text expansion' syntax is accepted here.\n"
-        "    More info: http://ffmpeg.org/ffmpeg-filters.html#Text-expansion\n",
+             "Valid format variables:\n"
+             "    {clip_start_timestamp} - Local time the clip starts at\n"
+             "    {clip_end_timestamp} - Local time the clip ends at\n"
+             "    {local_timestamp_rolling} - Local time which continuously updates "
+             "(shorthand for '%%{{pts:localtime:{local_timestamp}:%%x %%X}}'), string\n"
+             "    {event_timestamp} - Timestamp from events.json (if provided), string\n"
+             "    {event_timestamp_countdown_rolling} - Local time which continuously updates "
+             "(shorthand for '%%{{hms:localtime:{event_timestamp}}}'), string\n"
+             "    {event_city} - City name from events.json (if provided), string\n"
+             "    {event_reason} - Recording reason from events.json (if provided), string\n"
+             "    {event_latitude} - Estimated latitude from events.json (if provided), float\n"
+             "    {event_longitude} - Estimated longitude from events.json (if provided), float\n"
+             "    \n"
+             "    All valid ffmpeg 'text expansion' syntax is accepted here.\n"
+             "    More info: http://ffmpeg.org/ffmpeg-filters.html#Text-expansion\n",
     )
     text_overlay_group.add_argument(
         "--timestamp_format",
@@ -3484,15 +3301,15 @@ def main() -> int:
         type=str,
         default="%x %X",
         help="R|Format for timestamps.\n "
-        "Determines how timestamps should be represented. Any valid value from strftime is accepted."
-        "Default is set '%%x %%X' which is locale's appropriate date and time representation"
-        "More info: https://strftime.org",
+             "Determines how timestamps should be represented. Any valid value from strftime is accepted."
+             "Default is set '%%x %%X' which is locale's appropriate date and time representation"
+             "More info: https://strftime.org",
     )
 
     filter_group = parser.add_argument_group(
         title="Timestamp Restriction",
         description="Restrict video to be between start and/or end timestamps. Timestamp to be provided in a ISO-8601 "
-        "format (see https://fits.gsfc.nasa.gov/iso-time.html for examples)",
+                    "format (see https://fits.gsfc.nasa.gov/iso-time.html for examples)",
     )
     filter_group.add_argument(
         "--start_timestamp", dest="start_timestamp", type=str, help="Starting timestamp"
@@ -3526,9 +3343,9 @@ def main() -> int:
         dest="sentry_offset",
         action="store_true",
         help="R|start_offset and end_offset will be based on when timestamp of object detection occurred for Sentry"
-        "events instead of start/end of event.\n"
-        "Ignored if either --sentry_start_offset or --senty_end_offset are provided.\n"
-        "Note, legacy option that will be removed in future.",
+             "events instead of start/end of event.\n"
+             "Ignored if either --sentry_start_offset or --senty_end_offset are provided.\n"
+             "Note, legacy option that will be removed in future.",
     )
 
     offset_group.add_argument(
@@ -3553,7 +3370,7 @@ def main() -> int:
         default=movie_folder,
         type=str,
         help="R|Path/Filename for the new movie file. Event files will be stored in same folder."
-        + os.linesep,
+             + os.linesep,
     )
     output_group.add_argument(
         "--motion_only",
@@ -3567,7 +3384,7 @@ def main() -> int:
         type=float,
         default=argparse.SUPPRESS,
         help="Slow down video output. Accepts a number that is then used as multiplier, providing 2 means half the "
-        "speed.",
+             "speed.",
     )
     output_group.add_argument(
         "--speedup",
@@ -3575,7 +3392,7 @@ def main() -> int:
         type=float,
         default=argparse.SUPPRESS,
         help="Speed up the video. Accepts a number that is then used as a multiplier, providing 2 means "
-        "twice the speed.",
+             "twice the speed.",
     )
     output_group.add_argument(
         "--chapter_offset",
@@ -3583,7 +3400,7 @@ def main() -> int:
         type=int,
         default=0,
         help="Offset in seconds for chapters in merged video. Negative offset is # of seconds before the end of the "
-        "subdir video, positive offset if # of seconds after the start of the subdir video.",
+             "subdir video, positive offset if # of seconds after the start of the subdir video.",
     )
 
     output_group.add_argument(
@@ -3595,16 +3412,16 @@ def main() -> int:
         const="",
         default=argparse.SUPPRESS,
         help="R|Merge the video files from different folders (events) into 1 big video file.\n"
-        "Optionally add a template string to group events in different video files based on the template.\n"
-        "Valid format variables:\n"
-        "    {layout} - Layout of the created movie (see --layout)\n"
-        "    {start_timestamp} - Local time the event started at\n"
-        "    {end_timestamp} - Local time the event ends at\n"
-        "    {event_timestamp} - Timestamp from events.json (if provided), string\n"
-        "    {event_city} - City name from events.json (if provided), string\n"
-        "    {event_reason} - Recording reason from events.json (if provided), string\n"
-        "    {event_latitude} - Latitude from events.json (if provided), float\n"
-        "    {event_longitude} - Longitude from events.json (if provided), float\n",
+             "Optionally add a template string to group events in different video files based on the template.\n"
+             "Valid format variables:\n"
+             "    {layout} - Layout of the created movie (see --layout)\n"
+             "    {start_timestamp} - Local time the event started at\n"
+             "    {end_timestamp} - Local time the event ends at\n"
+             "    {event_timestamp} - Timestamp from events.json (if provided), string\n"
+             "    {event_city} - City name from events.json (if provided), string\n"
+             "    {event_reason} - Recording reason from events.json (if provided), string\n"
+             "    {event_latitude} - Latitude from events.json (if provided), float\n"
+             "    {event_longitude} - Longitude from events.json (if provided), float\n",
     )
 
     output_group.add_argument(
@@ -3613,9 +3430,9 @@ def main() -> int:
         type=str,
         default="%Y-%m-%d_%H_%M",
         help="R|Format for timestamps in merge_template.\n "
-        "Determines how timestamps should be represented within merge_template. Any valid value from strftime is accepted."
-        "Default is set '%%Y-%%m-%%d_%%H_%%M'"
-        "More info: https://strftime.org",
+             "Determines how timestamps should be represented within merge_template. Any valid value from strftime is accepted."
+             "Default is set '%%Y-%%m-%%d_%%H_%%M'"
+             "More info: https://strftime.org",
     )
 
     output_group.add_argument(
@@ -3640,74 +3457,46 @@ def main() -> int:
         type=str.upper,
         default="START",
         help="Match modification timestamp of resulting video files to event timestamp. Use START to match with when "
-        "the event started, STOP for end time of the event, SENTRY for Sentry event timestamp, or RENDER to not change it.",
+             "the event started, STOP for end time of the event, SENTRY for Sentry event timestamp, or RENDER to not change it.",
     )
 
     advancedencoding_group = parser.add_argument_group(
         title="Advanced encoding settings", description="Advanced options for encoding"
     )
 
-    if PLATFORM == "darwin":
-        if PROCESSOR != "arm":
-            nogpuhelp = "R|Disable use of GPU acceleration, default is to use GPU acceleration.\n"
-            gpuhelp = "R|Use GPU acceleration (this is the default).\n"
-        else:
-            nogpuhelp = "R|Disable use of GPU acceleration, this is the default as currently ffmpeg has issues on Apple Silicon with GPU acceleration.\n"
-            gpuhelp = (
-                "R|Use GPU acceleration.\n"
-                "  Note: ffmpeg currently seems to have issues on Apple Silicon with GPU acceleration resulting in corrupt video.\n"
-            )
+    advancedencoding_group.add_argument(
+        "--no-gpu",
+        dest="gpu",
+        action="store_false",
+        default=argparse.SUPPRESS,
+        help="R|Disable use of GPU acceleration, this is the default.\n",
+    )
 
-        advancedencoding_group.add_argument(
-            "--no-gpu",
-            dest="gpu",
-            action="store_false",
-            default=argparse.SUPPRESS,
-            help=nogpuhelp,
-        )
+    advancedencoding_group.add_argument(
+        "--gpu",
+        dest="gpu",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help="R|Use GPU acceleration, only enable if supported by hardware.\n"
+             " --gpu_type has to be provided as well when enabling this parameter",
+    )
 
-        advancedencoding_group.add_argument(
-            "--gpu",
-            dest="gpu",
-            action="store_true",
-            default=argparse.SUPPRESS,
-            help=gpuhelp,
-        )
-
-    elif PLATFORM != "darwin":
-        advancedencoding_group.add_argument(
-            "--no-gpu",
-            dest="gpu",
-            action="store_false",
-            default=argparse.SUPPRESS,
-            help="R|Disable use of GPU acceleration, this is the default.\n",
-        )
-
-        advancedencoding_group.add_argument(
-            "--gpu",
-            dest="gpu",
-            action="store_true",
-            default=argparse.SUPPRESS,
-            help="R|Use GPU acceleration, only enable if supported by hardware.\n"
-            " --gpu_type has to be provided as well when enabling this parameter",
-        )
-
-        advancedencoding_group.add_argument(
-            "--gpu_type",
-            choices=["nvidia", "intel", "qsv", "rpi", "vaapi"]
-            if PLATFORM == "linux"
-            else ["nvidia", "intel", "vaapi"],
-            type=str.lower,
-            help="Type of graphics card (GPU) in the system. This determines the encoder that will be used."
-            "This parameter is mandatory if --gpu is provided.",
-        )
+    advancedencoding_group.add_argument(
+        "--gpu_type",
+        choices=["nvidia", "intel", "qsv", "rpi", "vaapi"]
+        if PLATFORM == "linux"
+        else ["nvidia", "intel", "vaapi"],
+        type=str.lower,
+        help="Type of graphics card (GPU) in the system. This determines the encoder that will be used."
+             "This parameter is mandatory if --gpu is provided.",
+    )
 
     advancedencoding_group.add_argument(
         "--no-faststart",
         dest="faststart",
         action="store_true",
         help="Do not enable flag faststart on the resulting video files. Use this when using a network share and "
-        "errors occur during encoding.",
+             "errors occur during encoding.",
     )
 
     advancedencoding_group.add_argument(
@@ -3717,7 +3506,7 @@ def main() -> int:
         default="LOWER",
         type=str.upper,
         help="Define the quality setting for the video, higher quality means bigger file size but might "
-        "not be noticeable.",
+             "not be noticeable.",
     )
 
     advancedencoding_group.add_argument(
@@ -3737,7 +3526,7 @@ def main() -> int:
         default="medium",
         type=str.lower,
         help="Speed to optimize video. Faster speed results in a bigger file. This does not impact the quality of "
-        "the video, just how much time is used to compress it.",
+             "the video, just how much time is used to compress it.",
     )
 
     advancedencoding_group.add_argument(
@@ -3746,7 +3535,7 @@ def main() -> int:
         type=int,
         default=24,
         help="Frames per second for resulting video. Tesla records at about 33fps hence going higher wouldn't do "
-        "much as frames would just be duplicated. Default is 24fps which is the standard for movies and TV shows",
+             "much as frames would just be duplicated. Default is 24fps which is the standard for movies and TV shows",
     )
 
     if internal_ffmpeg:
@@ -3773,8 +3562,8 @@ def main() -> int:
         type=str.lower,
         default=argparse.SUPPRESS,
         help="R|Encoding to use for video creation.\n"
-        "    x264: standard encoding, can be viewed on most devices but results in bigger file.\n"
-        "    x265: newer encoding standard but not all devices support this yet.\n",
+             "    x264: standard encoding, can be viewed on most devices but results in bigger file.\n"
+             "    x265: newer encoding standard but not all devices support this yet.\n",
     )
     advancedencoding_group.add_argument(
         "--enc",
@@ -3782,8 +3571,8 @@ def main() -> int:
         type=str,
         default=argparse.SUPPRESS,
         help="R|Provide a custom encoder for video creation. Cannot be used in combination with --encoding.\n"
-        "Note: when using this option the --gpu option is ignored. To use GPU hardware acceleration specify an "
-        "encoding that provides this.",
+             "Note: when using this option the --gpu option is ignored. To use GPU hardware acceleration specify an "
+             "encoding that provides this.",
     )
 
     advancedencoding_group.add_argument(
@@ -3797,18 +3586,7 @@ def main() -> int:
     update_check_group = parser.add_argument_group(
         title="Update Check", description="Check for updates"
     )
-    update_check_group.add_argument(
-        "--check_for_update",
-        dest="check_for_updates",
-        action="store_true",
-        help="Check for update and exit.",
-    )
-    update_check_group.add_argument(
-        "--no-check_for_update",
-        dest="no_check_for_updates",
-        action="store_true",
-        help="A check for new updates is performed every time. With this parameter that can be disabled",
-    )
+
     update_check_group.add_argument(
         "--include_test",
         dest="include_beta",
@@ -3842,84 +3620,6 @@ def main() -> int:
         )
         return 1
 
-    if not args.no_check_for_updates or args.check_for_updates:
-        release_info = check_latest_release(args.include_beta)
-        if release_info is not None:
-            new_version = False
-            if release_info.get("tag_name") is not None:
-                github_version = release_info.get("tag_name").split(".")
-                if len(github_version) == 3:
-                    # Release tags normally start with v. If that is the case
-                    # then strip the v.
-                    try:
-                        major_version = int(github_version[0])
-                    except ValueError:
-                        major_version = int(github_version[0][1:])
-
-                    minor_version = int(github_version[1])
-                    if release_info.get("prerelease"):
-                        # Drafts will have b and then beta number.
-                        patch_version = int(github_version[2].split("b")[0])
-                        beta_version = int(github_version[2].split("b")[1])
-                    else:
-                        patch_version = int(github_version[2])
-                        beta_version = -1
-
-                    if major_version == VERSION["major"]:
-                        if minor_version == VERSION["minor"]:
-                            if patch_version == VERSION["patch"]:
-                                if beta_version > VERSION["beta"] or (
-                                    beta_version == -1 and VERSION["beta"] != -1
-                                ):
-                                    new_version = True
-                            elif patch_version > VERSION["patch"]:
-                                new_version = True
-                        elif minor_version > VERSION["minor"]:
-                            new_version = True
-                    elif major_version > VERSION["major"]:
-                        new_version = True
-
-            if new_version:
-                beta = ""
-                if release_info.get("prerelease"):
-                    beta = "beta "
-
-                release_notes = ""
-                if not args.check_for_updates:
-                    if args.system_notification:
-                        notify(
-                            "TeslaCam",
-                            "Update available",
-                            f"New {beta}release {release_info.get('tag_name')} is available. You are on version "
-                            f"{VERSION_STR}",
-                        )
-                    release_notes = (
-                        "Use --check_for_update to get latest " "release notes."
-                    )
-
-                print(
-                    f"{get_current_timestamp()}New {beta}release {release_info.get('tag_name')} is available for "
-                    f"download ({release_info.get('html_url')}). You are currently on {VERSION_STR}. {release_notes}"
-                )
-
-                if args.check_for_updates:
-                    print(
-                        f"{get_current_timestamp()}You can download the new release from: "
-                        f"{release_info.get('html_url')}"
-                    )
-                    print(
-                        f"{get_current_timestamp()}Release Notes:\n {release_info.get('body')}"
-                    )
-                    return 0
-            else:
-                if args.check_for_updates:
-                    print(
-                        f"{get_current_timestamp()}{VERSION_STR} is the latest release available."
-                    )
-                    return 0
-        else:
-            print(f"{get_current_timestamp()} Did not retrieve latest version info.")
-
     internal_ffmpeg = getattr(args, "ffmpeg", None) is None and internal_ffmpeg
     ffmpeg = getattr(args, "ffmpeg", ffmpeg_default) or ""
     if not internal_ffmpeg and (ffmpeg == "" or which(ffmpeg) is None):
@@ -3928,13 +3628,6 @@ def main() -> int:
             f"within PATH environment or provide full path using parameter --ffmpeg."
         )
         return 1
-
-    if internal_ffmpeg and PLATFORM == "darwin" and PROCESSOR == "arm":
-        print(
-            "Internal ffmpeg version is used which has been compiled for Intel Macs. Better results in both "
-            "performance and size can be achieved by downloading an Apple Silicon compiled ffmpeg from: https://www.osxexperts.net "
-            "and providing it leveraging the --ffmpeg parameter."
-        )
 
     if args.clip_pos:
         # If clip positions have been provided it is custom.
@@ -4053,11 +3746,11 @@ def main() -> int:
     black_size = f"s={{width}}x{{height}}:c={args.background}, fps={args.fps} "
 
     ffmpeg_base = (
-        black_base
-        + black_size.format(
-            width=layout_settings.video_width, height=layout_settings.video_height
-        )
-        + "[base]"
+            black_base
+            + black_size.format(
+        width=layout_settings.video_width, height=layout_settings.video_height
+    )
+            + "[base]"
     )
 
     ffmpeg_black_video = ";" + black_base + black_size
@@ -4114,11 +3807,7 @@ def main() -> int:
             return 0
 
         # noinspection PyPep8
-        temp_font_file = (
-            f"c:\{layout_settings.font.font}"
-            if PLATFORM == "win32"
-            else layout_settings.font.font
-        )
+        temp_font_file = layout_settings.font.font
         if not os.path.isfile(temp_font_file):
             print(
                 f"{get_current_timestamp()}Font file {temp_font_file} does not exist. Provide a valid font file using --font or"
@@ -4133,11 +3822,11 @@ def main() -> int:
 
         # noinspection PyPep8,PyPep8,PyPep8
         ffmpeg_timestamp = (
-            ffmpeg_timestamp + f"drawtext=fontfile={layout_settings.font.font}:"
-            f"fontcolor={layout_settings.font.color}:fontsize={layout_settings.font.size}:"
-            "borderw=2:bordercolor=black@1.0:"
-            f"x={layout_settings.font.halign}:y={layout_settings.font.valign}:"
-            "text='__USERTEXT__'"
+                ffmpeg_timestamp + f"drawtext=fontfile={layout_settings.font.font}:"
+                                   f"fontcolor={layout_settings.font.color}:fontsize={layout_settings.font.size}:"
+                                   "borderw=2:bordercolor=black@1.0:"
+                                   f"x={layout_settings.font.halign}:y={layout_settings.font.valign}:"
+                                   "text='__USERTEXT__'"
         )
 
         ffmpeg_timestamp = filter_string.format(
@@ -4172,11 +3861,7 @@ def main() -> int:
 
     ffmpeg_params = ["-preset", args.compression, "-crf", MOVIE_QUALITY[args.quality]]
 
-    use_gpu = (
-        getattr(args, "gpu", True)
-        if PLATFORM == "darwin" and PROCESSOR != "arm"
-        else getattr(args, "gpu", False)
-    )
+    use_gpu = getattr(args, "gpu", False)
 
     video_encoding = []
     ffmpeg_hwdev = []
@@ -4191,56 +3876,22 @@ def main() -> int:
 
         # GPU acceleration enabled
         if use_gpu:
-            if PLATFORM == "darwin":
-                print(f"{get_current_timestamp()}GPU acceleration is enabled")
-                video_encoding = video_encoding + ["-allow_sw", "1"]
-                encoding = encoding + "_mac"
+            if args.gpu_type is None:
+                print(
+                    f"{get_current_timestamp()}Parameter --gpu_type is mandatory when parameter "
+                    f"--use_gpu is used."
+                )
+                return 0
 
+            # Confirm that GPU acceleration with this encoding is supported.
+            if MOVIE_ENCODING.get(encoding + "_" + args.gpu_type) is None:
+                # It is not, defaulting then to no GPU
+                print(
+                    f"{get_current_timestamp()}GPU acceleration not available for encoding {encoding} and GPU type {args.gpu_type}. GPU acceleration disabled."
+                )
             else:
-                if args.gpu_type is None:
-                    print(
-                        f"{get_current_timestamp()}Parameter --gpu_type is mandatory when parameter "
-                        f"--use_gpu is used."
-                    )
-                    return 0
-
-                # Confirm that GPU acceleration with this encoding is supported.
-                if MOVIE_ENCODING.get(encoding + "_" + args.gpu_type) is None:
-                    # It is not, defaulting then to no GPU
-                    print(
-                        f"{get_current_timestamp()}GPU acceleration not available for encoding {encoding} and GPU type {args.gpu_type}. GPU acceleration disabled."
-                    )
-                else:
-                    print(f"{get_current_timestamp()}GPU acceleration is enabled.")
-                    encoding = encoding + "_" + args.gpu_type
-
-                    # If using vaapi hw acceleration this takes the decoding and filter processing done in software
-                    # and passes it up to the GPU for hw accelerated encoding.
-                    if args.gpu_type == "vaapi":
-                        ffmpeg_hwupload = filter_string.format(
-                            input_clip=input_clip,
-                            filter=f"format=nv12,hwupload",
-                            filter_counter=filter_counter,
-                        )
-                        input_clip = f"tmp{filter_counter}"
-                        filter_counter += 1
-
-                        if PLATFORM == "linux":
-                            ffmpeg_hwdev = ffmpeg_hwdev + [
-                                "-vaapi_device",
-                                "/dev/dri/renderD128",
-                            ]
-                            ffmpeg_hwout = ffmpeg_hwout + [
-                                "-hwaccel_output_format",
-                                "vaapi",
-                            ]
-                    elif args.gpu_type == "qsv":
-                        if PLATFORM == "linux":
-                            ffmpeg_hwdev = ffmpeg_hwdev + [
-                                "-qsv_device",
-                                "/dev/dri/renderD128",
-                            ]
-                            ffmpeg_hwout = ffmpeg_hwout + ["-hwaccel", "qsv"]
+                print(f"{get_current_timestamp()}GPU acceleration is enabled.")
+                encoding = encoding + "_" + args.gpu_type
 
             bit_rate = str(int(10000 * layout_settings.scale)) + "K"
             video_encoding = video_encoding + ["-b:v", bit_rate]
@@ -4257,8 +3908,8 @@ def main() -> int:
     # Determine the target folder and filename.
     # If no extension then assume it is a folder.
     if (
-        os.path.splitext(args.output)[1] is not None
-        and os.path.splitext(args.output)[1] != ""
+            os.path.splitext(args.output)[1] is not None
+            and os.path.splitext(args.output)[1] != ""
     ):
         target_folder, target_filename = os.path.split(args.output)
         if target_folder is None or target_folder == "":
@@ -4531,9 +4182,9 @@ def main() -> int:
                         print(
                             f"{get_current_timestamp()}                          {folder}"
                         )
-                
+
                 print(f"Source folder list: {source_folder_list}")
-                
+
                 if video_settings["run_type"] == "MONITOR":
                     # We will continue to monitor hence we need to
                     # ensure we always have a unique final movie name.
@@ -4541,9 +4192,9 @@ def main() -> int:
                         datetime.today().strftime("%Y-%m-%d_%H_%M")
                         if video_settings["target_filename"] is None
                         else os.path.splitext(video_settings["target_filename"])[0]
-                        + "_"
-                        + datetime.today().strftime("%Y-%m-%d_%H_%M")
-                        + os.path.splitext(video_settings["target_filename"])[1]
+                             + "_"
+                             + datetime.today().strftime("%Y-%m-%d_%H_%M")
+                             + os.path.splitext(video_settings["target_filename"])[1]
                     )
                 else:
                     movie_filename = (
@@ -4555,7 +4206,7 @@ def main() -> int:
                     f"video_settings attribute movie_filename set to {movie_filename}."
                 )
                 video_settings.update({"movie_filename": movie_filename})
-                
+
                 process_folders(source_folder_list, video_settings, args.delete_source)
 
                 print(f"{get_current_timestamp()}Processing of movies has completed.")
@@ -4619,7 +4270,7 @@ def main() -> int:
             f"video_settings attribute movie_filename set to {movie_filename}."
         )
         video_settings.update({"movie_filename": movie_filename})
-        
+
         process_folders(video_settings["source_folder"], video_settings, args.delete_source)
 
 
