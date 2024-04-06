@@ -3786,6 +3786,14 @@ def main() -> int:
         "encoding that provides this.",
     )
 
+    advancedencoding_group.add_argument(
+        "--pix_fmt",
+        required=False,
+        type=str,
+        default=argparse.SUPPRESS,
+        help="The pixel format used along with the encoding.",
+    )
+
     update_check_group = parser.add_argument_group(
         title="Update Check", description="Check for updates"
     )
@@ -4241,6 +4249,9 @@ def main() -> int:
     else:
         video_encoding = video_encoding + ["-c:v", args.enc]
 
+    if "pix_fmt" in args and args.pix_fmt:
+        ffmpeg_params = ffmpeg_params + ["-pix_fmt", args.pix_fmt]
+
     ffmpeg_params = ffmpeg_params + video_encoding
 
     # Determine the target folder and filename.
@@ -4348,6 +4359,7 @@ def main() -> int:
         "movie_speed": speed,
         "video_encoding": video_encoding,
         "movie_encoding": args.encoding if "encoding" in args else "x264",
+        "pixel_format": args.pix_fmt,
         "fps": args.fps,
         "movie_compression": args.compression,
         "movie_quality": args.quality,
