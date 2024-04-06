@@ -4010,7 +4010,7 @@ def main() -> int:
         "movie_speed": speed,
         "video_encoding": video_encoding,
         "movie_encoding": args.encoding if "encoding" in args else "x264",
-        "pixel_format": args.pix_fmt,
+        "pixel_format": args.pix_fmt if "pix_fmt" in args else None,
         "fps": args.fps,
         "movie_compression": args.compression,
         "movie_quality": args.quality,
