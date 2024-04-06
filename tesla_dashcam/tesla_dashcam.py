@@ -17,13 +17,14 @@ from shutil import which
 from subprocess import CalledProcessError, TimeoutExpired, run
 from tempfile import mkstemp
 from time import sleep, time as timestamp, mktime
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple
 
 import requests
 from dateutil.parser import isoparse
 from psutil import disk_partitions
 from tzlocal import get_localzone
 import multiprocessing
+import concurrent.futures
 import functools
 
 import staticmap
@@ -1774,13 +1775,16 @@ def get_metadata(ffmpeg, filenames):
 
 
 def create_intermediate_movie(
-        event_info: Event, clip_info: Clip, folder_timestamps, video_settings, clip_number
+        clip_data: Tuple[int, float], event_info: Event, folder_timestamps, video_settings
 ):
     """Create intermediate movie files. This is the merging of the 3 camera
 
     video files into 1 video file."""
     # We first stack (combine the 3 different camera video files into 1
     # and then we concatenate.
+    clip_number, clip_timestamp = clip_data
+    clip_info = event_info.clip(clip_timestamp)
+
     clip_filenames = {}
 
     for camera_name, camera_info in clip_info.cameras:
@@ -1793,7 +1797,7 @@ def create_intermediate_movie(
             f"No valid front, left, right, and rear camera clip exist for "
             f'{clip_info.timestamp.astimezone(get_localzone()).strftime("%Y-%m-%dT%H-%M-%S")}'
         )
-        return True
+        return clip_info, True
 
     # Determine if this clip is to be included based on potential start and end timestamp/offsets that were provided.
     # Clip starting time is between the start&end times we're looking for
@@ -1813,7 +1817,7 @@ def create_intermediate_movie(
             f"Clip timestamp from {starting_timestamp} to {ending_timestamp} not "
             f"between {folder_timestamps[0]} and {folder_timestamps[1]}"
         )
-        return True
+        return clip_info, True
 
     # Determine if we need to do an offset of the starting timestamp
     ffmpeg_offset_command = []
@@ -1848,7 +1852,7 @@ def create_intermediate_movie(
         _LOGGER.debug(
             f"Clip duration is {clip_duration}, not processing as no valid video."
         )
-        return True
+        return clip_info, True
 
     ffmpeg_camera_commands = []
     ffmpeg_camera_filters = []
@@ -1918,7 +1922,7 @@ def create_intermediate_movie(
             metadata = get_metadata(video_settings["ffmpeg_exec"], [temp_movie_name])
             clip_info.duration = metadata[0]["duration"] if metadata else None
 
-            return True
+            return clip_info, True
     else:
         target_folder = (
             video_settings["temp_dir"]
@@ -2068,7 +2072,7 @@ def create_intermediate_movie(
             f"{get_current_timestamp()}\t\t\tCommand: {exc.cmd}\n"
             f"{get_current_timestamp()}\t\t\tError: {exc.stderr}\n\n"
         )
-        return False
+        return clip_info, False
     _LOGGER.debug("FFMPEG output:\n %s", ffmpeg_output.stdout)
     _LOGGER.debug("FFMPEG error output:\n %s", ffmpeg_output.stderr)
 
@@ -2079,7 +2083,7 @@ def create_intermediate_movie(
     metadata = get_metadata(video_settings["ffmpeg_exec"], [temp_movie_name])
     clip_info.duration = metadata[0]["duration"] if metadata else None
 
-    return True
+    return clip_info, True
 
 
 def create_title_screen(events, video_settings):
@@ -2768,27 +2772,29 @@ def process_event(event, event_list, video_settings, delete_source, movies):
     delete_folder_files = delete_source
     delete_file_list = []
 
-    for clip_number, clip_timestamp in enumerate(event_info.sorted):
-        clip_info = event_info.clip(clip_timestamp)
+    sorted_clips = enumerate(event_info.sorted)
+    results = None
 
-        if create_intermediate_movie(
-                event_info,
-                clip_info,
-                (event_start_timestamp, event_end_timestamp),
-                video_settings,
-                clip_number,
-        ):
+    with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+        # Use the map() method to apply a function to a list of arguments
+        results = executor.map(functools.partial(create_intermediate_movie, event_info=event_info, folder_timestamps=(event_start_timestamp, event_end_timestamp), video_settings=video_settings), sorted_clips)
 
-            if clip_info.filename != event_info.filename:
-                delete_folder_clips.append(clip_info.filename)
+        # Wait for all tasks to complete using the shutdown() method
+        executor.shutdown()
 
-            # Add the files to our list for removal.
-            for _, camera_info in clip_info.cameras:
-                delete_file_list.append(
-                    os.path.join(event_folder, camera_info.filename)
-                )
-        else:
-            delete_folder_files = False
+    if results:
+        for clip_info, status in results:
+            if status:
+                if clip_info.filename != event_info.filename:
+                    delete_folder_clips.append(clip_info.filename)
+
+                # Add the files to our list for removal.
+                for _, camera_info in clip_info.cameras:
+                    delete_file_list.append(
+                        os.path.join(event_folder, camera_info.filename)
+                    )
+            else:
+                delete_folder_files = False
 
     # All clips for the event  have been processed, merge those clips
     # together now.
