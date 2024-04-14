@@ -149,6 +149,9 @@ if PLATFORM == "darwin" and PROCESSOR == "i386":
 # PROCESSOR = "arm"
 
 
+def create_chunks(lst, n):
+    return [lst[i * n: (i + 1) * n] for i in range((len(lst) + n - 1) // n )]
+
 class Camera_Clip(object):
     """Camera Clip Class"""
 
@@ -2862,7 +2865,7 @@ def process_event(event, event_list, video_settings, delete_source, movies):
         delete_intermediate([event_folder])
     
 
-def process_folders(source_folders, video_settings, delete_source):
+def process_folders(source_folders, video_settings, delete_source, chunk_size):
     """Process all clips found within folders."""
 
     # Retrieve all the video files within the folders provided.
@@ -2887,8 +2890,11 @@ def process_folders(source_folders, video_settings, delete_source):
 
     events = list(enumerate(sorted(event_list)))
     
-    with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
-        pool.map(functools.partial(process_event, event_list=event_list, video_settings=video_settings, delete_source=delete_source, movies=movies), events)
+    chunked_events = create_chunks(events, n=chunk_size)
+    
+    for event_chunk in chunked_events:
+        with multiprocessing.Pool(min(multiprocessing.cpu_count(), len(event_chunk))) as pool:
+            pool.map(functools.partial(process_event, event_list=event_list, video_settings=video_settings, delete_source=delete_source, movies=movies), event_chunk)
 
     # Now that we have gone through all the folders merge.
     # We only do this if merge is enabled OR if we only have 1 movie with 1 event clip and for
@@ -3214,6 +3220,12 @@ def main() -> int:
         dest="exclude_subdirs",
         action="store_true",
         help="Do not search sub folders (events) for video files to process.",
+    )
+    input_group.add_argument(
+        "--chunk_size",
+        dest="chunk_size",
+        type=int,
+        help="The number of events to process simultaneously."
     )
 
     monitor_group = parser.add_argument_group(
@@ -4556,7 +4568,7 @@ def main() -> int:
                 )
                 video_settings.update({"movie_filename": movie_filename})
                 
-                process_folders(source_folder_list, video_settings, args.delete_source)
+                process_folders(source_folder_list, video_settings, args.delete_source, args.chunk_size)
 
                 print(f"{get_current_timestamp()}Processing of movies has completed.")
                 if args.system_notification:
@@ -4620,7 +4632,7 @@ def main() -> int:
         )
         video_settings.update({"movie_filename": movie_filename})
         
-        process_folders(video_settings["source_folder"], video_settings, args.delete_source)
+        process_folders(video_settings["source_folder"], video_settings, args.delete_source, args.chunk_size)
 
 
 if sys.version_info < (3, 8):
