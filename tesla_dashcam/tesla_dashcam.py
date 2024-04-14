@@ -2892,7 +2892,8 @@ def process_folders(source_folders, video_settings, delete_source, chunk_size):
     
     chunked_events = create_chunks(events, n=chunk_size)
     
-    for event_chunk in chunked_events:
+    for chunk_index, event_chunk in enumerate(chunked_events):
+        print(f"Processing chunk {chunk_index + 1}")
         with multiprocessing.Pool(min(multiprocessing.cpu_count(), len(event_chunk))) as pool:
             pool.map(functools.partial(process_event, event_list=event_list, video_settings=video_settings, delete_source=delete_source, movies=movies), event_chunk)
 
